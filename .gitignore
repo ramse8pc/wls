@@ -5,7 +5,7 @@
 *.pydevproject
 .project
 .metadata
-bin/
+#bin/
 tmp/
 *.tmp
 *.bak
@@ -63,7 +63,7 @@ build/
 *.pdb
 *.pgc
 *.pgd
-*.rsp
+#*.rsp
 *.sbr
 *.tlb
 *.tli
@@ -140,7 +140,7 @@ csx
 AppPackages/
 
 # Others
-sql/
+#sql/
 *.Cache
 ClientBin/
 [Ss]tyle[Cc]op.*
