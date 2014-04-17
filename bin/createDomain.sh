@@ -4,6 +4,11 @@
 #
 # DESC: Creates a WLS domain based on parameter file values.
 #
+# $HeadURL:  $
+# $LastChangedBy: $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2014/01/31 cgwong - [v1.0.0] Rebuild file.
@@ -45,14 +50,15 @@ msg ()
 create_basic_domain() 
 {
 	${WL_HOME}/common/bin/wlst.sh -loadProperties ${SCRIPT_PATH}/WLSenv-dom.properties ${SCRIPT_PATH}/createDomain.py
-
+  
+  msg create_basic_domain INFO "Copying demo Keystore."
 	mkdir -p ${CFG_BASE}/domains/${DOMAIN_NAME}/nodemanager/security
 	cp ${CFG_BASE}/domains/${DOMAIN_NAME}/security/DemoIdentity.jks ${CFG_BASE}/domains/${DOMAIN_NAME}/nodemanager/security
 }
 
 change_memory_settings_using_overridefile() 
 {
-# DESC: Creates or modifies setUserOverrides.sh file with the following:
+# Creates/modifies setUserOverrides.sh file with the following:
 #
 #ADMIN_SERVER_MEM_ARGS="-Xms512m -Xmx512m -XX:PermSize=256m -XX:MaxPermSize=256m"
 #SERVER_MEM_ARGS="-Xms512m -Xmx512m -XX:PermSize=256m -XX:MaxPermSize=256m"
@@ -81,11 +87,10 @@ change_memory_settings_using_overridefile()
 # The Xms and Xms parameters are configurable by using the ASRV_HEAP_SZ, MSRV_HEAP_SZ, and
 # CSRV_HEAP_SZ variables.
 
-	msg change_memory_settings_using_overridefile NOTE 'CHANGE DERBY FLAG'
+	msg change_memory_settings_using_overridefile NOTE "Changing Derby flag in ${CFG_BASE}/domains/${DOMAIN_NAME}/bin/setDomainEnv.sh"
 	sed -i -e '/DERBY_FLAG="true"/ s:DERBY_FLAG="true":DERBY_FLAG="false":' ${CFG_BASE}/domains/${DOMAIN_NAME}/bin/setDomainEnv.sh
 
-	msg change_memory_settings_using_overridefile NOTE 'CHANGE MEMORY SETTINGS'
-
+	msg change_memory_settings_using_overridefile NOTE "Changing memory settings in ${CFG_BASE}/domains/${DOMAIN_NAME}/bin/setUserOverrides.sh"
 	touch ${CFG_BASE}/domains/${DOMAIN_NAME}/bin/setUserOverrides.sh
 	chmod u+x ${CFG_BASE}/domains/${DOMAIN_NAME}/bin/setUserOverrides.sh
 

@@ -9,6 +9,11 @@
 #       is not, then no permanent change in the user's environment
 #       can take place.
 #
+# $HeadURL: $
+# $LastChangedBy: cgwong $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2014/03/20 cgwong - [v1.0.0] Creation.
@@ -90,9 +95,9 @@ ASVR_HEAP_SZ=512m
 ASVR_PERM_SZ=256m
 
 # Managed Server JVM sizes
-MSRV_HEAP_SZ=512m
-MSRV_PERM_SZ=256m
+MSRV_HEAP_SZ=1024m
+MSRV_PERM_SZ=512m
 
 # Coherence JVM sizes
-CSRV_HEAP_SZ=512m
-CSRV_PERM_SZ=256m
+CSRV_HEAP_SZ=2048m
+CSRV_PERM_SZ=512m

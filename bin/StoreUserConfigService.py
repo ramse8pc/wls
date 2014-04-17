@@ -4,6 +4,11 @@
 # DESC: Creates user config and key file to store 
 #       secure credentials.
 #
+# $HeadURL: $
+# $LastChangedBy: cgwong $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2014/03/19 cgwong - [v1.0.0] Creation.
@@ -30,7 +35,7 @@ print 'CONNECT TO NODE MANAGER';
 nmConnect(nm_username, nm_password, nm_listen_address, nm_listen_port, domain_name, domain_home, nm_mode);
 
 print 'CREATE NODE MANAGER USER CONFIG FILES';
-storeUserConfig(domain_home +'/nm_key_file.properties', domain_home + '/nm_cfg_file.properties', 'true');
+storeUserConfig(domain_home + nm_cfg_file, domain_home + nm_key_file, 'true');
 
 print 'DISCONNECT FROM NODE MANAGER';
 nmDisconnect();
@@ -40,7 +45,7 @@ aserver_url = 't3s://' + aserver_listen_address + ':' + aserver_listen_port;
 connect(aserver_username, aserver_password, aserver_url);
 
 print 'CREATE ADMIN SERVER USER CONFIG FILES';
-storeUserConfig(domain_home +'/aserver_cfg_file.properties', domain_home + '/aserver_key_file.properties', 'false');
+storeUserConfig(domain_home + aserver_cfg_file, domain_home + aserver_key_file, 'false');
 
 print 'DISCONNECT FROM THE ADMIN SERVER';
 disconnect();

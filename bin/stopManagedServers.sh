@@ -4,6 +4,11 @@
 #
 # DESC: Stops Managed Servers for Oracle WebLogic Server (WLS) domain.
 #
+# $HeadURL: $
+# $LastChangedBy: cgwong $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2014/01/20 cgwong - [v1.0.0] Creation.

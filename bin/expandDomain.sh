@@ -1,18 +1,32 @@
 #!/bin/sh
+######################################################
+# NAME: expandDomain.sh
+#
+# DESC: Expands a WLS domain based on parameter file values.
+#
+# $HeadURL:  $
+# $LastChangedBy: $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
+# LOG:
+# yyyy/mm/dd [user] - [notes]
+# 2014/04/16 cgwong - [v1.0.0] Initial creation.
+######################################################
 
 SCRIPT=$(readlink -f $0)
 SCRIPT_PATH=$(dirname $SCRIPT)
 
-. ${SCRIPT_PATH}/../WLSenv.sh
+. ${SCRIPT_PATH}/WLSenv-dom.sh
 
 unpack_domain() 
 {
-  ${WLS_HOME}/common/bin/unpack.sh -domain=${CFG_HOME}/domains/${DOMAIN_NAME} -template=${TEMPORARY_DIRECTORY}/templates/${DOMAIN_NAME}.jar
+  ${WL_HOME}/common/bin/unpack.sh -domain=${CFG_HOME}/domains/${DOMAIN_NAME} -template=${SLIB_DIR}/templates/${DOMAIN_NAME}.jar
 }
 
-change_domain() 
+expand_domain() 
 {
-  ${WLS_HOME}/common/bin/wlst.sh -loadProperties ${SCRIPT_PATH}/../environment.properties ${SCRIPT_PATH}/changeDomain.py
+  ${WL_HOME}/common/bin/wlst.sh -loadProperties ${SCRIPT_PATH}/WLSenv-dom.properties ${SCRIPT_PATH}/expandDomain.py
 
   mkdir -p ${CFG_HOME}/domains/${DOMAIN_NAME}/nodemanager/security
   cp ${CFG_HOME}/domains/${DOMAIN_NAME}/security/DemoIdentity.jks ${CFG_HOME}/domains/${DOMAIN_NAME}/nodemanager/security
@@ -59,7 +73,5 @@ change_memory_settings()
 }
 
 unpack_domain
-
-change_domain
-
+expand_domain
 change_memory_settings

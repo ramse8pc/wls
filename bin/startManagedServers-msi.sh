@@ -3,6 +3,11 @@
 # NAME: startManagedServers-msi.sh
 # DESC: Starts WLS Managed Server in independence mode.
 #
+# $HeadURL: $
+# $LastChangedBy: cgwong $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2014/03/19 cgwong - [v1.0.0] Creation.

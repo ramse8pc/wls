@@ -4,6 +4,11 @@
 # DESC: Jython WLST script to create basic domain (Node Manager
 #       plus AdminServer).
 #
+# $HeadURL:  $
+# $LastChangedBy: $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user]: [version] [notes]
 # 2014/01/17 cgwong: [v1.0.0] Initial creation.
@@ -56,6 +61,7 @@ setOption('OverwriteDomain', 'true');
 setOption('JavaHome', java_home);
 setOption('ServerStartMode', 'prod');
 cd('/Security/base_domain/User/weblogic');
+##cd('/Security/' + domain_name + '/User/weblogic/');
 cmo.setName(aserver_username);
 cmo.setUserPassword(aserver_password);
 cd('/');
@@ -98,7 +104,7 @@ cd('../../');
 cd('AuthenticationProviders/MonsantoAD');
 set('ControlFlag', 'SUFFICIENT');
 set('PropagateCauseForLoginException', 'true');
-set('Principal', 'cn=' + ldap_principal + ',ou=Non-User Accounts,ou=1000,ou=Locations,dc=na,dc=ds,dc=monsanto,dc=com');
+set('Principal', ldap_principal);
 set('CredentialEncrypted', ldap_principal_password);
 set('Host', ldap_host);
 set('UserBaseDN', 'dc=ds,dc=monsanto,dc=com');
@@ -114,6 +120,42 @@ set('StaticGroupObjectClass', 'group');
 set('StaticGroupDNsfromMemberDNFilter', '(&(member=%M)(objectclass=group))');
 set('StaticMemberDNAttribute', 'member');
 
+print "SETUP KEYSTORE SERVICE";
+cd('/');
+set('CustomIdentityKeyStoreFileName',keystore_location);
+set('CustomIdentityKeyStorePassPhraseEncrypted',keystore_pwd);
+set('CustomIdentityKeyStoreType','JKS');
+set('CustomTrustKeyStoreFileName',keystore_location);
+set('CustomTrustKeyStorePassPhraseEncrypted',keystore_pwd);
+set('CustomTrustKeyStoreType','JKS');
+set('KeyStores','CustomIdentityAndCustomTrust');
+
+print "SETUP MISCELLANEIOUS SETTINGS";
+set('ConfigurationAuditType', 'log');
+set('ArchiveConfigurationCount', '10');
+set('ConfigBackupEnabled', 'true');
+set('MSIFileReplicationEnabled','true');
+
+print "SETUP LOGGING"
+cd('/Servers/' + aserver_name + '/Log/' + aserver_name)
+set('LogFileSeverity', 'Warning')
+set('RotationType', 'bySize')
+set('FileMinSize', '10240')
+set('FileCount', '10')
+set('RotateLogOnStartup', 'true')
+set('NumberOfFilesLimited', 'true')
+set('RedirectStdoutToServerLogEnabled', 'true')
+set('FileName', weblog_base + '/' + domain_name + '/' + aserver_name + '/' + aserver_name + '.log')
+#set('LogFileRotationDir', weblog_base + '/' + domain_name + '/' + aserver_name + '/archive')
+cmo.setDomainLogBroadcastSeverity('Off')
+cd('/Servers/' + aserver_name + '/WebServer/' + aserver_name + '/WebServerLog/' + aserver_name)
+set('FileName', weblog_base + '/' + domain_name + '/' + aserver_name + '/access.log')
+set('RotationType', 'bySize')
+set('FileMinSize', '10240')
+set('FileCount', '10')
+set('RotateLogOnStartup', 'true')
+set('NumberOfFilesLimited', 'true')
+  
 print 'SAVE CHANGES';
 updateDomain();
 closeDomain();
@@ -123,6 +165,7 @@ directory_name = domain_home + '/servers/'+ aserver_name +'/security';
 file_name = 'boot.properties';
 content = 'username=' + aserver_username + '\npassword=' + aserver_password;
 createFile(directory_name, file_name, content);
+os.system('chmod 700 ' + directory_name + '/' + file_name)
 
 directory_name = domain_application_home;
 file_name = 'readme.txt';
@@ -132,7 +175,7 @@ createFile(directory_name, file_name, content);
 directory_name = nm_home;
 file_name = 'nodemanager.properties';
 if nm_mode == 'plain':
-	content='DomainsFile=' + nm_home + '/nodemanager.domains\nLogLimit=0\nPropertiesVersion=12.1.2\nAuthenticationEnabled=true\nNodeManagerHome=' + nm_home + '\nJavaHome=' + java_home +'\nLogLevel=INFO\nDomainsFileEnabled=true\nStartScriptName=startWebLogic.sh\nListenAddress=\nNativeVersionEnabled=true\nListenPort=5556\nLogToStderr=true\nSecureListener=false\nLogCount=1\nStopScriptEnabled=false\nQuitEnabled=false\nLogAppend=true\nStateCheckInterval=500\nCrashRecoveryEnabled=true\nStartScriptEnabled=true\nLogFile=' + nm_home + '/nodemanager.log\nLogFormatter=weblogic.nodemanager.server.LogFormatter\nListenBacklog=50';
+	content='DomainsFile=' + nm_home + '/nodemanager.domains\nLogLimit=0\nPropertiesVersion=12.1.2\nAuthenticationEnabled=true\nNodeManagerHome=' + nm_home + '\nJavaHome=' + java_home + '\nLogLevel=INFO\nDomainsFileEnabled=true\nStartScriptName=startWebLogic.sh\nListenAddress=\nNativeVersionEnabled=true\nListenPort=' + nm_listen_port + '\nLogToStderr=true\nSecureListener=false\nLogCount=1\nStopScriptEnabled=false\nQuitEnabled=false\nLogAppend=true\nStateCheckInterval=500\nCrashRecoveryEnabled=true\nStartScriptEnabled=true\nLogFile=' + nm_home + '/nodemanager.log\nLogFormatter=weblogic.nodemanager.server.LogFormatter\nListenBacklog=50';
 else:
-	content='DomainsFile=' + nm_home + '/nodemanager.domains\nLogLimit=0\nPropertiesVersion=12.1.2\nAuthenticationEnabled=true\nNodeManagerHome=' + nm_home + '\nJavaHome=' + java_home +'\nLogLevel=INFO\nDomainsFileEnabled=true\nStartScriptName=startWebLogic.sh\nListenAddress=\nNativeVersionEnabled=true\nListenPort=5556\nLogToStderr=true\nSecureListener=false\nLogCount=1\nStopScriptEnabled=false\nQuitEnabled=false\nLogAppend=true\nStateCheckInterval=500\nCrashRecoveryEnabled=true\nStartScriptEnabled=true\nLogFile=' + nm_home + '/nodemanager.log\nLogFormatter=weblogic.nodemanager.server.LogFormatter\nListenBacklog=50';
+	content='DomainsFile=' + nm_home + '/nodemanager.domains\nLogLimit=0\nPropertiesVersion=12.1.2\nAuthenticationEnabled=true\nNodeManagerHome=' + nm_home + '\nJavaHome=' + java_home + '\nLogLevel=INFO\nDomainsFileEnabled=true\nStartScriptName=startWebLogic.sh\nListenAddress=\nNativeVersionEnabled=true\nListenPort=' + nm_listen_port + '\nLogToStderr=true\nSecureListener=false\nLogCount=1\nStopScriptEnabled=false\nQuitEnabled=false\nLogAppend=true\nStateCheckInterval=500\nCrashRecoveryEnabled=true\nStartScriptEnabled=true\nLogFile=' + nm_home + '/nodemanager.log\nLogFormatter=weblogic.nodemanager.server.LogFormatter\nListenBacklog=50';
 createFile(directory_name, file_name, content);

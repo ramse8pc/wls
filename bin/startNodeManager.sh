@@ -4,6 +4,11 @@
 #
 # DESC: Starts Node Manager for Oracle WebLogic Server (WLS) domain.
 #
+# $HeadURL: $
+# $LastChangedBy: cgwong $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2013/09/12 cgwong - [v1.0.0] Creation.

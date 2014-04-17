@@ -12,6 +12,12 @@
 #       chkconfig --add nodemanager
 #       chkconfig --list nodemanager
 #       chkconfig nodemanager on
+#
+# $HeadURL:  $
+# $LastChangedBy: $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG
 # yyyy/mm/dd [user]: [version] [notes]
 # 2014/01/20 cgwong: [v1.0.0] Creation.

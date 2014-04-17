@@ -1,8 +1,13 @@
 # ############################################################
-# NAME: createBasicDomain.py
+# NAME: buildDomain.py
 #
 # DESC: Jython WLST script to build domain (cluster, machines
 #       managed servers, data sources, and JMS).
+#
+# $HeadURL:  $
+# $LastChangedBy: $
+# $LastChangedDate: $
+# $LastChangedRevision: $
 #
 # LOG:
 # yyyy/mm/dd [user]: [version] [notes]
@@ -12,24 +17,18 @@
 import socket;
 
 # JMS info
-jms_system_resource_name='JmsSystemModule';
-sub_deployment_name=jms_system_resource_name + 'SubDeployment';
-connection_factory_jndi_names=['jms/ConnectionFactory'];
-distributed_queue_names=['CompanyDistributedQueue'];
-distributed_queue_jndi_names=['jms/CompanyQueue'];
-distributed_error_queue_names=['CompanyDistributedErrorQueue'];
-distributed_error_queue_jndi_names=['jms/CompanyErrorQueue'];
+sub_deployment_name = jms_system_resource_name + jms_sub_deployment_name;
 
 # Data Source info
-data_source_test='SQL SELECT 1 FROM DUAL';
+data_source_test = 'SQL SELECT 1 FROM DUAL';
 
 print 'CREATE PATHS';
-domain_name=os.getenv('DOMAIN_NAME');
-java_home=os.getenv('JAVA_HOME');
-mw_home=os.getenv('MW_HOME');
-wls_home=os.getenv('WL_HOME');
-fmw_home=os.getenv('MW_HOME');
-cfg_home = os.getenv('SHARE_BASE');
+domain_name = os.getenv('DOMAIN_NAME');
+java_home = os.getenv('JAVA_HOME');
+mw_home = os.getenv('MW_HOME');
+wls_home = os.getenv('WL_HOME');
+fmw_home = os.getenv('FMW_HOME');
+cfg_home = os.getenv('CFG_BASE');
 
 domain_home=cfg_home + '/domains/' + domain_name;
 domain_application_home=cfg_home + '/webapps/' + domain_name;
@@ -42,11 +41,28 @@ def connect_to_admin_server():
   connect(aserver_username, aserver_password, aserver_url);
 
 def create_cluster():
-  print 'CREATE CLUSTER';
+  print 'CREATE STANDARD CLUSTER';
   cluster = cmo.createCluster(cluster_name);
   cluster.setClusterMessagingMode('unicast');
   return cluster;
 
+def create_dynamic_cluster():
+  print 'CREATE DYNAMIC CLUSTER';
+  dcluster = cmo.createCluster(cluster_name);
+  dcluster.setClusterMessagingMode('unicast');
+  cmo.createServerTemplate(dcluster_template_name);
+  server_template = cmo.lookupServerTemplate(dcluster_template_name);
+  server_template.setListenPort(dcluster_listen_port_start);
+  server_template.setCluster(dcluster);
+  dcluster.getDynamicServers().setServerTemplate(server_template);
+  dcluster.getDynamicServers().setMaximumDynamicServerCount(mserver_count);
+  dcluster.getDynamicServers().setMachineNameMatchExpression(dclust_machine_match);
+  dcluster.getDynamicServers().setServerNamePrefix(dclust_mserver_prefix);
+  dcluster.getDynamicServers().setCalculatedMachineName(java.lang.Boolean('true'));
+  dcluster.getDynamicServers().setCalculatedListenPorts(java.lang.Boolean('true'));
+  dcluster.setCluster
+  return dcluster;
+  
 def create_machines_and_servers(cluster):
   print 'CREATE MACHINES AND SERVERS';
   for i in range(len(machine_listen_addresses)):
@@ -62,7 +78,7 @@ def create_machines_and_servers(cluster):
       print 'MACHINE ' + machine_listen_addresses[i] + ' already exists and will not be created.'
     for j in range(mserver_per_domain):
       mserver_listen_port = mserver_listen_port_start + j;
-      mserver_server_name = domain_name + '_msvr_' + repr(mserver_listen_port);
+      mserver_server_name = 'msvr_' + j + '_' + repr(mserver_listen_port);
       server = cmo.createServer(mserver_server_name);
       server.setListenPort(mserver_listen_port);
       server.setListenAddress(machine_listen_addresses[i]);
@@ -113,21 +129,21 @@ def create_messaging_resources(targets):
   #sub_deployment_targets = [];
   #for server in servers:
   #	if (server.getName() != admin_server_name):
-  #		file_store = cmo.createFileStore('filestore_' + server.getName());
+  #		file_store = cmo.createFileStore('fstore_' + server.getName());
   #		file_store.setDirectory(domain_application_home);
   #		singleton_target = file_store.getTargets();
   #		singleton_target.append(server);
   #		file_store.setTargets(singleton_target);
-  #		jms_server = cmo.createJMSServer('jmsserver_' + server.getName());
+  #		jms_server = cmo.createJMSServer('jms_svr_' + server.getName());
   #		jms_server.setPersistentStore(file_store);
   #		jms_server.setTargets(singleton_target);
   #		sub_deployment_targets.append(ObjectName(repr(jms_server.getObjectName())));
 
   sub_deployment_targets = [];
-  file_store = cmo.createFileStore(cluster_name + '_filestore');
+  file_store = cmo.createFileStore('fstore' + cluster_name);
   file_store.setDirectory(domain_application_home);
   file_store.setTargets(module_targets);
-  jms_server = cmo.createJMSServer(cluster_name + '_jmsserver');
+  jms_server = cmo.createJMSServer('jms_svr_' + cluster_name);
   jms_server.setPersistentStore(file_store);
   jms_server.setTargets(module_targets);
   sub_deployment_targets.append(ObjectName(repr(jms_server.getObjectName())));
@@ -208,7 +224,7 @@ def create_users_and_map_roles():
 
   print 'CREATE USERS AND MAP ROLES';
   security_realm = cmo.getSecurityConfiguration().getDefaultRealm();
-  authentication_provider = security_realm.lookupAuthenticationProvider('DefaultAuthenticator');
+  authentication_provider = security_realm.lookupAuthenticationProvider(authenticator);
   authentication_provider.createUser('employee', 'welcome1', 'an employee');
   authentication_provider.createUser('manager', 'welcome1', 'a manager');
   authentication_provider.createGroup('employees', 'employee group');

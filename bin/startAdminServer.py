@@ -4,6 +4,12 @@
 # DESC: Starts Oracle WebLogic Server (WLS) domain Administration Server.
 #       Note that the file ${DOMAIN_HOME}/servers/${ADMIN_SERVER_NAME}/security/boot.properties
 #       must exist in order to start a server with nmStart.
+#
+# $HeadURL:  $
+# $LastChangedBy: $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2014/01/17 cgwong - [v1.0.0] Creation.
@@ -30,7 +36,7 @@ nm_home = domain_home + '/nodemanager';
 
 print 'CONNECT TO NODE MANAGER';
 ##nmConnect(nm_username, nm_password, nm_listen_address, nm_listen_port, domain_name, domain_home, nm_mode);
-nmConnect(userConfigFile=domain_home +'/nm_cfg_file.properties', userKeyFile=domain_home + '/nm_key_file.properties', host=nm_listen_address, port=nm_listen_port, domainName=domain_name, domainDir=domain_home, nmType=nm_mode);
+nmConnect(userConfigFile=domain_home + nm_cfg_file, userKeyFile=domain_home + nm_key_file, host=nm_listen_address, port=nm_listen_port, domainName=domain_name, domainDir=domain_home, nmType=nm_mode);
 
 print 'START ADMIN SERVER';
 nmStart(aserver_name);

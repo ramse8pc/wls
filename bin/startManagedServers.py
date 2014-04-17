@@ -3,6 +3,11 @@
 #
 # DESC: Starts Oracle WebLogic Server (WLS) domain Managed Servers.
 #
+# $HeadURL: $
+# $LastChangedBy: cgwong $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2014/01/17 cgwong - [v1.0.0] Creation.
@@ -17,7 +22,7 @@ print 'CONNECT TO ADMIN SERVER';
 aserver_listen_address = socket.gethostname();
 aserver_url = 't3s://' + aserver_listen_address + ':' + aserver_listen_port;
 ##connect(aserver_username, aserver_password, aserver_url);
-connect(userConfigFile=domain_home +'/aserver_cfg_file.properties', userKeyFile=domain_home + '/aserver_key_file.properties', url=aserver_url);
+connect(userConfigFile=domain_home + aserver_cfg_file, userKeyFile=domain_home + aserver_key_file, url=aserver_url);
 
 
 print 'STARTING SERVERS';

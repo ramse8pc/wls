@@ -4,6 +4,11 @@
 #
 # DESC: Stops Admin Server Oracle WebLogic Server (WLS) domain.
 #
+# $HeadURL: $
+# $LastChangedBy: cgwong $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2013/09/12 cgwong - Creation.

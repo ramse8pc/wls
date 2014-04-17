@@ -5,6 +5,11 @@
 #       Gets list of managed server names from ${DOMAIN_HOME}/servers
 #       directory then filters and walks through the list to start the servers.
 #
+# $HeadURL: $
+# $LastChangedBy: cgwong $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2014/03/19 cgwong - [v1.0.0] Creation.
@@ -36,7 +41,7 @@ denames = java.util.ArrayList(delist);
 print 'CONNECT TO NODE MANAGER';
 nm_listen_address = socket.gethostname();
 ##nmConnect(nm_username, nm_password, nm_listen_address, nm_listen_port, domain_name, domain_home, nm_mode);
-nmConnect(userConfigFile=domain_home +'/nm_cfg_file.properties', userKeyFile=domain_home + '/nm_key_file.properties', host=nm_listen_address, port=nm_listen_port, domainName=domain_name, domainDir=domain_home, nmType=nm_mode);
+nmConnect(userConfigFile=domain_home + nm_cfg_file, userKeyFile=domain_home + nm_key_file.properties, host=nm_listen_address, port=nm_listen_port, domainName=domain_name, domainDir=domain_home, nmType=nm_mode);
 
 print 'STARTING SERVERS';
 for dename in denames:

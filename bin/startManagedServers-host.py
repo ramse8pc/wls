@@ -3,6 +3,11 @@
 #
 # DESC: Starts WLS local Managed Servers.
 #
+# $HeadURL: $
+# $LastChangedBy: cgwong $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2014/03/19 cgwong - [v1.0.0] Creation.
@@ -32,11 +37,11 @@ command_output.close();
 loadProperties(output.rstrip());
 aserver_url = AdminURL.replace('https','t3s');
 ##connect(aserver_username, aserver_password, aserver_url);
-connect(userConfigFile=domain_home +'/aserver_cfg_file.properties', userKeyFile=domain_home + '/aserver_key_file.properties', url=aserver_url);
+connect(userConfigFile=domain_home + aserver_cfg_file, userKeyFile=domain_home + aserver_key_file, url=aserver_url);
 
 print 'CONNECT TO NODE MANAGER ON ' + nm_listen_address + ':' + repr(nm_listen_port);
 ##nmConnect(nm_username, nm_password, nm_listen_address, nm_listen_port, domain_name, domain_home, nm_mode);
-nmConnect(userConfigFile=domain_home +'/nm_cfg_file.properties', userKeyFile=domain_home + '/nm_key_file.properties', host=nm_listen_address, port=nm_listen_port, domainName=domain_name, domainDir=domain_home, nmType=nm_mode);
+nmConnect(userConfigFile=domain_home + nm_cfg_file, userKeyFile=domain_home + nm_key_file, host=nm_listen_address, port=nm_listen_port, domainName=domain_name, domainDir=domain_home, nmType=nm_mode);
 
 domainRuntime();
 cd('ServerRuntimes');

@@ -1,7 +1,13 @@
 #!/bin/sh
 ######################################################
 # NAME: startManagedServers.sh
+#
 # DESC: Starts Managed Server for Oracle WebLogic Server (WLS) domain.
+#
+# $HeadURL: $
+# $LastChangedBy: cgwong $
+# $LastChangedDate: $
+# $LastChangedRevision: $
 #
 # LOG:
 # yyyy/mm/dd [user] - [notes]

@@ -4,6 +4,11 @@
 #
 # DESC: Installs Oracle WebLogic Server (WLS) 10.3.5 software.
 #
+# $HeadURL: $
+# $LastChangedBy: cgwong $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2013/09/12 cgwong - [v1.0.0] Creation.

@@ -1,9 +1,21 @@
-#!/bin/sh
+#!/bin/bash
+######################################################
+# NAME: stopDomain.sh
+#
+# DESC: Stop WLS domain.
+#
+# $HeadURL:  $
+# $LastChangedBy: $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
+# LOG:
+# yyyy/mm/dd [user] - [notes]
+# 2014/04/16 cgwong - [v1.0.0] Creation.
+######################################################
 
-BEA_HOME="/www/weblogic/weblogic12.1.1"
-export BEA_HOME
+SCRIPT=`basename $0`
+SCRIPT_PATH=$(dirname $SCRIPT)
 
-WL_HOME="${BEA_HOME}/wlserver_12.1"
-export WL_HOME
-
-. ${WL_HOME}/common/bin/wlst.sh ${BEA_HOME}/deploy/scripts/stopDomain.py
+${SCRIPT_PATH}/stopManagedServers.sh
+${SCRIPT_PATH}/stopAdminServer.sh

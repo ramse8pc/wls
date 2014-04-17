@@ -4,6 +4,11 @@
 #
 # DESC: Builds a WLS domain based on parameter file values.
 #
+# $HeadURL:  $
+# $LastChangedBy: $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2014/01/21 cgwong - [v1.0.0] Initial creation.
@@ -12,7 +17,7 @@
 SCRIPT=$(readlink -f $0)
 SCRIPT_PATH=$(dirname $SCRIPT)
 
-. ${SCRIPT_PATH}/WLSenv.sh
+. ${SCRIPT_PATH}/WLSenv-dom.sh
 
 # -- Variables -- #
 PID=$$
@@ -42,17 +47,17 @@ msg ()
 
 create_deployment_environment() 
 {
-  ${WL_HOME}/common/bin/wlst.sh -loadProperties ${SCRIPT_PATH}/DOMenv.properties ${SCRIPT_PATH}/buildDomain.py
+  ${WL_HOME}/common/bin/wlst.sh -loadProperties ${SCRIPT_PATH}/WLSenv-dom.properties ${SCRIPT_PATH}/buildDomain.py
 }
 
 pack_domain() 
 {
-  if [ -f ${STG_DIR}/templates/${DOMAIN_NAME}.jar ]; then
+  if [ -f ${SLIB_DIR}/templates/${DOMAIN_NAME}.jar ]; then
     msg pack_domain NOTE 'Removing old template...'
-    rm -f ${STG_DIR}/templates/${DOMAIN_NAME}.jar
+    rm -f ${SLIB_DIR}/templates/${DOMAIN_NAME}.jar
   fi
   msg pack_domain NOTE 'Packing domain...'
-  ${WL_HOME}/common/bin/pack.sh -managed=true -domain=${CFG_HOME}/domains/${DOMAIN_NAME} -template=${STG_DIR}/templates/${DOMAIN_NAME}.jar -template_name=${DOMAIN_NAME}
+  ${WL_HOME}/common/bin/pack.sh -managed=true -domain=${CFG_HOME}/domains/${DOMAIN_NAME} -template=${SLIB_DIR}/templates/${DOMAIN_NAME}.jar -template_name=${DOMAIN_NAME}
 }
 
 create_deployment_environment

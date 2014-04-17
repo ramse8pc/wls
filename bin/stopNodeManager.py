@@ -3,6 +3,11 @@
 #
 # DESC: Stops Node Manager for Oracle WebLogic Server (WLS) domain.
 #
+# $HeadURL: $
+# $LastChangedBy: cgwong $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+#
 # LOG:
 # yyyy/mm/dd [user] - [notes]
 # 2014/01/17 cgwong - [v1.0.0] Creation.
@@ -28,5 +33,5 @@ nm_home = domain_home + '/nodemanager';
 
 print 'STOPPING NODE MANAGER';
 ##nmConnect(nm_username, nm_password, nm_listen_address, nm_listen_port, domain_name, domain_home, nm_mode);
-nmConnect(userConfigFile=domain_home +'/nm_cfg_file.properties', userKeyFile=domain_home + '/nm_key_file.properties', host=nm_listen_address, port=nm_listen_port, domainName=domain_name, domainDir=domain_home, nmType=nm_mode);
+nmConnect(userConfigFile=domain_home + nm_cfg_file, userKeyFile=domain_home + nm_key_file, host=nm_listen_address, port=nm_listen_port, domainName=domain_name, domainDir=domain_home, nmType=nm_mode);
 stopNodeManager();
