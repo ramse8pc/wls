@@ -2,7 +2,7 @@
 ######################################################
 # NAME: WLSinst.sh
 #
-# DESC: Installs Oracle WebLogic Server (WLS) 10.3.5 software.
+# DESC: Installs Oracle WebLogic Server (WLS) 12c software.
 #
 # $HeadURL: $
 # $LastChangedBy: cgwong $
@@ -31,18 +31,17 @@
 #                     Various bug fixes.
 # 2014/03/25 cgwong - [v2.3.1] Removed inventory update (process does not exist).
 #                     Updated directory empty checks.
+# 2014/04/17 cgwong: [v2.3.2] Various minor code improvements.
 ######################################################
 
 SCRIPT=`basename $0`
 SCRIPT_PATH=$(dirname $SCRIPT)
 SETUP_FILE=${SCRIPT_PATH}/WLSenv-inst.sh
 
-. ${SETUP_FILE}
+##. ${SETUP_FILE}
 
 # -- Variables -- #
 PID=$$
-LOGFILE=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`.log
-BSU_LOG=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`-bsu.log
 SKIP_JDK="N"
 ERR=1     # Error status
 SUC=0     # Success status
@@ -66,23 +65,23 @@ msg ()
 
   # Variables
   TIMESTAMP=`date "+%Y-%m-%d %H:%M:%S"`
-  [[ -n $LOGFILE ]] && echo -e "[${TIMESTAMP}],PRC: ${1},PID: ${PID},HOST: $TGT_HOST,USER: ${USER}, STATUS: ${2}, MSG: ${3}" | tee -a $LOGFILE
+  [[ -n $LOGFILE ]] && echo -e "[${TIMESTAMP}],PRC: ${1},PID: ${PID},HOST: ${TGT_HOST},USER: ${USER}, STATUS: ${2}, MSG: ${3}" | tee -a $LOGFILE
 }
 
 show_usage ()
 { # Show script usage
   echo "
  ${SCRIPT} - Linux shell script to install Oracle JDK and WebLogic Server (WLS) 12c software.
-  This script should NOT be used for WLS 11g installation as it does not include the
-  logic required for that installation. There should be another script available
-  to install WLS 11g. This script will install, in order of installation:
+  The following steps are done:
   
-  1. The specified Oracle JDK release (optional)
-  2. The specified WLS 12c software release
-  3. Any patches as specified to be applied to WLS
+  1. Install the specified Oracle JDK release (optional)
+  2. Install the specified WLS 12c software release
+  3. Apply any patches as specified to the WLS installation
   
   The default environment setup file, ${SETUP_FILE}, is assumed to be in the same directory
-  as this script. The -f parameter can be used to specify another file or location.
+  as this script. The -f parameter can be used to specify another file or location. Patches
+  should be in the regular zipped naming format in order to be applied. See below for the 
+  full script usage and options.
 
  USAGE
  ${SCRIPT} [OPTION]
@@ -115,30 +114,49 @@ create_silent_install_files()
     msg create_silent_install_files INFO "Creating temporary Oracle Inventory file..."
     echo "inventory_loc=${ORAINV_HOME}" > ${STG_DIR}/`basename ${ORAINV_PTR_FILE}`
     echo "inst_group=${OINST_GRP}"     >> ${STG_DIR}/`basename ${ORAINV_PTR_FILE}`
-    ORAINV_PTR_FILE=${STG_DIR}/`basename ${ORAINV_PTR_FILE}` ; export ORAINV_PTR_FILE
+    ORAINV_PTR_FILE=${STG_DIR}/`basename ${ORAINV_PTR_FILE}`
     msg create_silent_install_files NOTE "Ensure ${ORAINV_PTR_FILE} is put under /etc and owned by root with permissions 770."
   else
     msg create_silent_install_files NOTE "Oracle Inventory file ${ORAINV_PTR_FILE} exists."
-    msg create_silent_install_files INFO "${ORAINV_PTR_FILE}: `cat ${ORAINV_PTR_FILE}`"
+    msg create_silent_install_files INFO "\n`cat ${ORAINV_PTR_FILE}`"
   fi
 }
 
 install_jdk() 
 { # Install Oracle JDK
-  if [ ! -d "${ORACLE_BASE}" ]; then    # Create ORACLE_BASE directory if it does not exist
+
+  # JDK extract name
+  JDK_DEFAULT_NAME="jdk1.7.0_51"
+  
+  # Create ORACLE_BASE directory if it does not exist
+  if [ ! -d "${ORACLE_BASE}" ]; then
     msg install_jdk INFO "Creating directory: ${ORACLE_BASE}."
     mkdir -p ${ORACLE_BASE}
   fi
 
-  if [ ! -f "$JVM_FILE" ]; then   # Check for existence of file
+  # Check for existence of files and directories
+  if [ ! -f "$JVM_FILE" ]; then
     msg install_jdk ERROR "Missing JVM file: ${JVM_FILE}."
     exit $ERR
   fi
+  if [ -d ${JVM_HOME} ]; then
+    msg install_jdk WARN "${JVM_HOME} already exists."
+    return 
+  fi
+  if [ -d ${JAVA_HOME} ]; then
+    msg install_jdk WARN "${JAVA_HOME} already exists."
+    return 
+  fi
+  
   msg install_jdk INFO "Installing Oracle JDK..."
-  tar xzf ${JVM_FILE} -C ${ORACLE_BASE}
-
-  # Rename the file and create a link which uses the full version
-  # This allows for easier JDK upgrades in future
+  tar xzf ${JVM_FILE} -C ${STG_DIR}
+  mkdir ${JVM_HOME}
+  mv ${STG_DIR}/${JDK_DEFAULT_NAME}/* ${JVM_HOME}/
+  rmdir ${STG_DIR}/${JDK_DEFAULT_NAME}
+  
+  # Create a link having the full version designation as a reference
+  # to the real generic named version. This allows for easier future JDK upgrades.
+  # WLS installation resolves links hence why this method.
   mv ${JVM_HOME} ${JAVA_HOME}/
   ln -s ${JAVA_HOME} ${JVM_HOME}
   
@@ -159,7 +177,16 @@ install_wls()
     exit $ERR
   fi
   msg install_wls INFO "Installing WebLogic Server..."
-  ${JAVA_HOME}/bin/java -d64 -Xms512m -Xmx512m -jar ${WL_FILE} -silent -response ${WL_RSP_FILE} -invPtrLoc ${ORAINV_PTR_FILE}
+  if [ -f ${JAVA_HOME}/bin/java ]; then
+    if [ `ls ${MW_HOME}/* 2>/dev/null | wc -l` -gt 0 ]; then
+      msg install_wls ERROR "Non-empty ${MW_HOME} directory. Directory must be empty for installation."
+      exit $ERR
+    fi
+    ${JAVA_HOME}/bin/java -d64 -Xms512m -Xmx512m -jar ${WL_FILE} -silent -response ${WL_RSP_FILE} -invPtrLoc ${ORAINV_PTR_FILE}
+  else
+    msg install_wls ERROR "Missing java binary in ${JAVA_HOME}/bin"
+    exit $ERR
+  fi
 }
 
 patch_wls ()
@@ -181,11 +208,17 @@ patch_wls ()
     # Save current directory and apply patches in turn (apply) instead of in bulk (napply)
     CURR_DIR=${PWD}
     msg patch_wls INFO "Applying WLS patches in repository."
+    if [ ! -f ${OCM_RSP_FILE} ]; then # Check for OCM response file
+      msg patch_wls WARN "Missing OCM response file ${OCM_RSP_FILE}. Patching will be interactive."
+      OCMRSP=""
+    else
+      OCMRSP="-ocmrf ${OCM_RSP_FILE}"
+    fi
     for fname in `ls -1 ${PB_DIR}/p1*.zip 2>/dev/null`; do
       unzip -oq ${fname} -d ${PB_CACHE_DIR}
       patchname=`basename ${fname} | cut -d 'p' -f2 | cut -d '_' -f1`
       cd ${PB_CACHE_DIR}/${patchname}
-      ${MW_HOME}/OPatch/opatch apply -silent -oh ${MW_HOME} -ocmrf ${OCM_RSP_FILE}
+      ${MW_HOME}/OPatch/opatch apply -silent -oh ${MW_HOME} ${OCMRSP}
     done
     
     cd ${CURR_DIR}    # Return to original directory
@@ -204,11 +237,10 @@ while [ $# -gt 0 ] ; do
   -f)   # Different setup file
     SETUP_FILE=$2
     if [ -z "$SETUP_FILE" ] || [ ! -f "$SETUP_FILE" ]; then
-      msg MAIN ERROR "A valid file is required for the -f parameter."
+      echo "ERROR: Invalid -f option."
       show_usage
       exit $ERR
     fi
-    . ${SETUP_FILE}
     shift ;;
   -nojdk)   # Skip JDK installation
     SKIP_JDK="Y"
@@ -222,6 +254,12 @@ while [ $# -gt 0 ] ; do
   esac
   shift
 done
+
+# Setup environment
+. ${SETUP_FILE}
+
+LOGFILE=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`.log
+BSU_LOG=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`-bsu.log
 
 # Setup staging
 RUN_DT=`date "+%Y%m%d-%H%M%S"`

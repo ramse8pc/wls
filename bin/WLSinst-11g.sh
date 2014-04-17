@@ -31,18 +31,17 @@
 # 2014/03/24 cgwong - [v2.2.1] Updated patching variables.
 # 2014/03/25 cgwong - [v2.3.1] Updated directory empty check.
 #                     Included response file update.
+# 2014/04/17 cgwong: [v2.3.2] Various minor code improvements.
 ######################################################
 
 SCRIPT=`basename $0`
 SCRIPT_PATH=$(dirname $SCRIPT)
 SETUP_FILE=${SCRIPT_PATH}/WLSenv-inst.sh
 
-. ${SETUP_FILE}
+##. ${SETUP_FILE}
 
 # -- Variables -- #
 PID=$$
-LOGFILE=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`.log
-PB_LOG=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`-bsu.log
 SKIP_JDK="N"
 ERR=1     # Error status
 SUC=0     # Success status
@@ -66,23 +65,23 @@ msg ()
 
   # Variables
   TIMESTAMP=`date "+%Y-%m-%d %H:%M:%S"`
-  [[ -n $LOGFILE ]] && echo -e "[${TIMESTAMP}],PRC: ${1},PID: ${PID},HOST: $TGT_HOST,USER: ${USER}, STATUS: ${2}, MSG: ${3}" | tee -a $LOGFILE
+  [[ -n $LOGFILE ]] && echo -e "[${TIMESTAMP}],PRC: ${1},PID: ${PID},HOST: ${TGT_HOST},USER: ${USER}, STATUS: ${2}, MSG: ${3}" | tee -a $LOGFILE
 }
 
 show_usage ()
 { # Show script usage
   echo "
  ${SCRIPT} - Linux shell script to install Oracle JRockit and WebLogic Server (WLS) 11g software.
-  This script should NOT be used for WLS 12c installation as it does not include the
-  logic required for that installation. There should be another script available
-  to install WLS 12c. This script will install, in order of installation:
+  Specifically, the following steps are done:
   
-  1. The specified Oracle JRockit release (optional)
-  2. The specified WLS 11g software release
-  3. Any patches as specified to be applied to WLS
+  1. Install the specified Oracle JRockit release (optional)
+  2. Install the specified WLS 11g software release
+  3. Apply any patches as specified to the WLS installation
   
   The default environment setup file, ${SETUP_FILE}, is assumed to be in the same directory
-  as this script. The -f parameter can be used to specify another file or location.
+  as this script. The -f parameter can be used to specify another file or location. Patches
+  should be in the regular zipped naming format in order to be applied. See below for the 
+  full script usage and options.
 
  USAGE
  ${SCRIPT} [OPTION]
@@ -134,21 +133,34 @@ create_silent_install_files()
 
 install_jdk() 
 { # Install Oracle JDK
-  if [ ! -d "${ORACLE_BASE}" ]; then    # Create ORACLE_BASE directory if it does not exist
+
+  # Create ORACLE_BASE directory if it does not exist
+  if [ ! -d "${ORACLE_BASE}" ]; then
     msg install_jdk INFO "Creating directory: ${ORACLE_BASE}."
     mkdir -p ${ORACLE_BASE}
   fi
 
-  if [ ! -f "$JVM_FILE" ]; then   # Check for existence of file
+  # Check for existence of files and directories
+  if [ ! -f "$JVM_FILE" ]; then
     msg install_jdk ERROR "Missing JVM file: ${JVM_FILE}."
     exit $ERR
   fi
+  if [ -d ${JVM_HOME} ]; then
+    msg install_jdk ERROR "${JVM_HOME} already exists."
+    return 
+  fi
+  if [ -d ${JAVA_HOME} ]; then
+    msg install_jdk ERROR "${JAVA_HOME} already exists."
+    return 
+  fi
+
   msg install_jdk INFO "Installing Oracle JRockit..."
   ${JVM_FILE} -mode=silent -silent_xml=${JVM_RSP_FILE}
 
-  # Rename the file and create a link which uses the full version
-  # This allows for easier JDK upgrades in future
-  mv ${JVM_HOME} ${JAVA_HOME}/
+  # Create a link having the full version designation as a reference
+  # to the real generic named version. This allows for easier future JDK upgrades.
+  # WLS installation resolves links hence why this method.
+  #mv ${JVM_HOME} ${JAVA_HOME}/
   ln -s ${JAVA_HOME} ${JVM_HOME}
   
   # Adjust Java entropy value to avoid performance bug with Linux
@@ -168,7 +180,16 @@ install_wls()
     exit $ERR
   fi
   msg install_wls INFO "Installing WebLogic Server..."
-  ${JAVA_HOME}/bin/java -d64 -Xms512m -Xmx512m -jar ${WL_FILE} -mode=silent -silent_xml=${WL_RSP_FILE}
+  if [ -f ${JAVA_HOME}/bin/java ]; then
+    if [ `ls ${MW_HOME}/* 2>/dev/null | wc -l` -gt 0 ]; then
+      msg install_wls ERROR "Non-empty ${MW_HOME} directory. Directory must be empty for installation."
+      exit $ERR
+    fi
+    ${JAVA_HOME}/bin/java -d64 -Xms512m -Xmx512m -jar ${WL_FILE} -mode=silent -silent_xml=${WL_RSP_FILE}
+  else
+    msg install_wls ERROR "Missing java binary in ${JAVA_HOME}/bin"
+    exit $ERR
+  fi
 }
 
 patch_wls ()
@@ -226,11 +247,10 @@ while [ $# -gt 0 ] ; do
   -f)   # Different setup file
     SETUP_FILE=$2
     if [ -z "$SETUP_FILE" ] || [ ! -f "$SETUP_FILE" ]; then
-      msg MAIN ERROR "A valid file is required for the -f parameter."
+      echo "ERROR: Invalid -f option."
       show_usage
       exit $ERR
     fi
-    . ${SETUP_FILE}
     shift ;;
   -nojdk)   # Skip JDK installation
     SKIP_JDK="Y"
@@ -244,6 +264,12 @@ while [ $# -gt 0 ] ; do
   esac
   shift
 done
+
+# Setup environment
+. ${SETUP_FILE}
+
+LOGFILE=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`.log
+PB_LOG=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`-bsu.log
 
 # Setup staging
 RUN_DT=`date "+%Y%m%d-%H%M%S"`

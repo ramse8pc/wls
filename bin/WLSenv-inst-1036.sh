@@ -31,6 +31,7 @@
 #                     Default to 10.3.6 setup.
 #                     Updated patching variables.
 # 2014/03/25 cgwong - [v1.2.3] Updated some variables. 
+# 2014/04/17 cgwong: [v1.2.4] Removed unneeded variables and updated others. 
 ######################################################
 
 # -- BASIC DIRECTORIES -- #
@@ -43,40 +44,36 @@ STG_DIR="/webtools/stage/wls" ; export STG_DIR
 # Installation log directory
 LOG_DIR="/webshare/weblogs/install" ; export LOG_DIR
 
-# Configuration base directory
-CFG_BASE="/webshare" ; export CFG_BASE
 
 # -- BASIC ORACLE VARIABLES -- #
-# Base directory for installation
+# Base/root directory for installation
 ORACLE_BASE="/www/web/product" ; export ORACLE_BASE
 
 # Oracle inventory location
-ORAINV_HOME="${ORACLE_BASE}/oraInventory" ; export ORAINV_HOME
+ORAINV_HOME="${ORACLE_BASE}/../oraInventory" ; export ORAINV_HOME
 
 # Oracle inventory pointer file
 ORAINV_PTR_FILE="/etc/oraInst.loc" ; export ORAINV_PTR_FILE
 
 # Group under which the software needs to be installed
-OINST_GRP="web" ; export OINST_GRP
+##OINST_GRP="web" ; export OINST_GRP
 
 # -- FMW STACK DIRECTORIES -- #
 # Middleware software home directory (stores binaries)
 MW_HOME="${ORACLE_BASE}/fmw_1" ; export MW_HOME
 
-# Fusion Middleware software installation
-FMW_HOME="${MW_HOME}/oracle_common" ; export FMW_HOME
-
-# WebLogic Server software home directory. 
+# WebLogic Server software home directory for pre-12c
 # Append appropriate "_major.minor" version designation for pre-12c if desired
 WL_HOME="${MW_HOME}/wlserver_10.3" ; export WL_HOME
 
-# Coherence software home directory
+# Coherence software home directory for pre-12c
 # Append appropriate "_major.minor" version designation for pre-12c if desired
-COHERENCE_HOME="${MW_HOME}/coherence_3.7" ; export COHERENCE_HOME
+##COHERENCE_HOME="${MW_HOME}/coherence_3.7" ; export COHERENCE_HOME
 
-# Oracle Service Bus (OSB) software home directory
+# Oracle Service Bus (OSB) software home directory for pre-12c
 # Append appropriate "_major.minor" version designation for pre-12c if desired
 OSB_HOME="${MW_HOME}/osb_11.1" ; export OSB_HOME
+
 
 # -- JVM INFO -- #
 # Name of JDK installation file
@@ -85,34 +82,35 @@ JVM_FILE="${SLIB_DIR}/suppl/jrockit-jdk1.6.0_45-R28.2.7-4.1.0-linux-x64.bin" ; e
 
 # Directory where the JDK will be installed using version designation
 ##JVM_HOME="${ORACLE_BASE}/jdk1.7.0_51" ; export JVM_HOME
-##JVM_HOME="${ORACLE_BASE}/jrockit-jdk1.6.0_45-1035" ; export JVM_HOME
-JVM_HOME="${ORACLE_BASE}/jrockit-jdk1.6.0_45-1036" ; export JVM_HOME
-
-# JVM home name for Oracle Inventory
-JVM_HOME_NAME="Oracle_JRockit6u45" ; export JVM_HOME_NAME
-##JVM_HOME_NAME="Oracle_JDK7u51" ; export JVM_HOME_NAME
+JVM_HOME="${ORACLE_BASE}/jrockit-jdk1.6.0_45-R28.2.7-4.1.0" ; export JVM_HOME
 
 # Directory where the JVM will be run using non-version designation
-##JAVA_HOME="${ORACLE_BASE}/jrockit-jdk-1035" ; export JAVA_HOME
-JAVA_HOME="${ORACLE_BASE}/jrockit-jdk-1036" ; export JAVA_HOME
 ##JAVA_HOME="${ORACLE_BASE}/jdk" ; export JAVA_HOME
+JAVA_HOME="${ORACLE_BASE}/jrockit-jdk" ; export JAVA_HOME
 
-# Name of the JRockit response installation file
+# JVM home name for Oracle Inventory
+##JVM_HOME_NAME="Oracle_JDK7u51" ; export JVM_HOME_NAME
+JVM_HOME_NAME="Oracle_JRockit6u45" ; export JVM_HOME_NAME
+
+# Name of the JRockit response installation file for pre-JDK7
 JVM_RSP_FILE="${SLIB_DIR}/resp/silent-jrockit.xml" ; export JVM_RSP_FILE
+
 
 # -- DOMAIN INFO -- #
 # Hostname of target installation server
 TGT_HOST=`hostname -f` ; export TGT_HOST
 
-# -- FILE INFO -- #
+
+# -- WL FILE INFO -- #
 # Name of the WebLogic installation file
+##WL_FILE="${SLIB_DIR}/wls_121200.jar" ; export WL_FILE
 ##WL_FILE="${SLIB_DIR}/wls1035_generic.jar" ; export WL_FILE
 WL_FILE="${SLIB_DIR}/wls1036_generic.jar" ; export WL_FILE
-##WL_FILE="${SLIB_DIR}/wls_121200.jar" ; export WL_FILE
 
 # Name of the WebLogic 12c response installation file
 ##WL_RSP_FILE="${SLIB_DIR}/resp/wls12c-inst.rsp" ; export WL_RSP_FILE
 WL_RSP_FILE="${SLIB_DIR}/resp/silent-wls.xml" ; export WL_RSP_FILE
+
 
 # -- PATCH INFO -- #
 # BSU directory
