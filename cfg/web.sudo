@@ -8,14 +8,14 @@
 # 2014/03/10 cgwong: [v1.1.0] Corrected syntax errors and updated to UNIX format
 # #################################################################
 
-###### Begin Web Team specifications ######
+# ##### Begin Web Team specifications ##### #
 
-## Cmnd aliases specification ##
+# # Cmnd aliases specification # #
 
 # Web clone commands (root)
 Cmnd_Alias ORA_PROV_ROOT = /bin/tar, /www/web/oraInventory/createCentralInventory.sh
 
-## Runas aliases specification ##
+# # Runas aliases specification # #
 
 # Web accounts
 Runas_Alias WEB_OWNERS = web
@@ -24,4 +24,4 @@ Runas_Alias WEB_OWNERS = web
 %nam-web-admins ALL = (WEB_OWNERS) ALL
 %nam-web-admins ALL = (root) ORA_PROV_ROOT
 
-###### End Web Team specifications ######
+# ##### End Web Team specifications ##### #
