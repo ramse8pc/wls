@@ -1,5 +1,9 @@
 # #################################################################
-# DESC: SUDO commands for Web team, add file to /etc/sudoers.d
+# NAME: web-sudo
+#
+# DESC: SUDO commands for Web team
+#       add file to /etc/sudoers.d for sudo version 1.7 and higher.
+#       Ensure line "#includedir /etc/sudoers.d" exists in /etc/sudoers file.
 #
 # LOG
 # yyyy/mm/dd [user]: [notes]
