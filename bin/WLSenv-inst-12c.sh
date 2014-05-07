@@ -96,6 +96,9 @@ JAVA_HOME="${ORACLE_BASE}/jdk" ; export JAVA_HOME
 # Name of the JRockit response installation file for pre-JDK7
 ##JVM_RSP_FILE="${SLIB_DIR}/resp/silent-jrockit.xml" ; export JVM_RSP_FILE
 
+# JDK extract name
+JDK_DEFAULT_NAME="jdk1.7.0_55" ; export JDK_DEFAULT_NAME
+
 
 # -- DOMAIN INFO -- #
 # Hostname of target installation server

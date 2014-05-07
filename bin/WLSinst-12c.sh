@@ -1,6 +1,6 @@
 #!/bin/bash
 ######################################################
-# NAME: WLSinst.sh
+# NAME: WLSinst-12c.sh
 #
 # DESC: Installs Oracle WebLogic Server (WLS) 12c software.
 #
@@ -125,10 +125,6 @@ create_silent_install_files()
 
 install_jdk() 
 { # Install Oracle JDK
-
-  # JDK extract name
-  JDK_DEFAULT_NAME="jdk1.7.0_51"
-  
   # Create ORACLE_BASE directory if it does not exist
   if [ ! -d "${ORACLE_BASE}" ]; then
     msg install_jdk INFO "Creating directory: ${ORACLE_BASE}."
