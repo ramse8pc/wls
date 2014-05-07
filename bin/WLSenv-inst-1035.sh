@@ -32,6 +32,7 @@
 #                     Updated patching variables.
 # 2014/03/25 cgwong - [v1.2.3] Updated some variables. 
 # 2014/04/17 cgwong: [v1.2.4] Removed unneeded variables and updated others. 
+# 2014/05/07 cgwong: [v1.2.5] Replaced PB_CACHE_DIR with BSU_CACHE_DIR. 
 ######################################################
 
 # -- BASIC DIRECTORIES -- #
@@ -78,11 +79,11 @@ OSB_HOME="${MW_HOME}/osb_11.1" ; export OSB_HOME
 
 # -- JVM INFO -- #
 # Name of JDK installation file
-##JVM_FILE="${SLIB_DIR}/suppl/jdk-7u51-linux-x64.tar.gz" ; export JVM_FILE
+##JVM_FILE="${SLIB_DIR}/suppl/jdk-7u55-linux-x64.tar.gz" ; export JVM_FILE
 JVM_FILE="${SLIB_DIR}/suppl/jrockit-jdk1.6.0_45-R28.2.7-4.1.0-linux-x64.bin" ; export JVM_FILE
 
 # Directory where the JDK will be installed using version designation
-##JVM_HOME="${ORACLE_BASE}/jdk1.7.0_51" ; export JVM_HOME
+##JVM_HOME="${ORACLE_BASE}/jdk1.7.0_55" ; export JVM_HOME
 JVM_HOME="${ORACLE_BASE}/jrockit-jdk1.6.0_45-R28.2.7-4.1.0" ; export JVM_HOME
 
 # Directory where the JVM will be run using non-version designation
@@ -90,7 +91,7 @@ JVM_HOME="${ORACLE_BASE}/jrockit-jdk1.6.0_45-R28.2.7-4.1.0" ; export JVM_HOME
 JAVA_HOME="${ORACLE_BASE}/jrockit-jdk" ; export JAVA_HOME
 
 # JVM home name for Oracle Inventory
-##JVM_HOME_NAME="Oracle_JDK7u51" ; export JVM_HOME_NAME
+##JVM_HOME_NAME="Oracle_JDK7u55" ; export JVM_HOME_NAME
 JVM_HOME_NAME="Oracle_JRockit6u45" ; export JVM_HOME_NAME
 
 # Name of the JRockit response installation file for pre-JDK7
@@ -120,14 +121,14 @@ BSU_DIR=${MW_HOME}/utils/bsu ; export BSU_DIR
 # BSU/Smart Update response file
 BSU_RSP_FILE="${SLIB_DIR}/resp/silent-bsu.xml"; export BSU_RSP_FILE
 
+# BSU patch cache directory
+BSU_CACHE_DIR=${BSU_DIR}/cache_dir ; export BSU_CACHE_DIR
+
 # Patch bundle designation to apply
 PB="wls_1035_pb1" ; export PB
 
 # Patch bundle directory
 PB_DIR=${SLIB_DIR}/patches/${PB} ; export PB_DIR
-
-# Patch cache directory
-PB_CACHE_DIR=${BSU_DIR}/cache_dir ; export PB_CACHE_DIR
 
 # Name of the OCM response file
 #OCM_RSP_FILE=${SLIB_DIR}/resp/ocm.rsp ; export OCM_RSP_FILE

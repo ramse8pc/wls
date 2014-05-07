@@ -32,6 +32,7 @@
 # 2014/03/25 cgwong - [v2.3.1] Updated directory empty check.
 #                     Included response file update.
 # 2014/04/17 cgwong: [v2.3.2] Various minor code improvements.
+# 2014/05/07 cgwong: [v2.3.3] Updated patching variables.
 ######################################################
 
 SCRIPT=`basename $0`
@@ -194,6 +195,9 @@ install_wls()
 
 patch_wls ()
 { # Apply patches to WLS
+  # Patch bundle cache directory
+  PB_CACHE_DIR=${STG_DIR}/cache_dir
+
   if [ `ls ${PB_DIR}/*.zip 2>/dev/null | wc -l` -gt 0 ]; then   # Not empty directory
     msg patch_wls INFO "Applying patch bundle ${PB} to WLS..."
 
@@ -201,36 +205,36 @@ patch_wls ()
     # This is ONLY required for WLS 10.3.5 so it can apply latest patches. The file MUST be manually renamed correctly
     # as we are expecting it to match a certain format such that the filtering works
     if [ `ls ${PB_DIR}/p*Generic-bsu.zip 2>/dev/null | wc -l` -gt 0 ]; then
-      [ ! -d ${PB_DIR}/cache_dir ] && mkdir ${PB_DIR}/cache_dir    # Create BSU cache directory if it does not exist
-      unzip -oq ${PB_DIR}/p*-bsu.zip -d ${PB_DIR}/cache_dir
+      [ ! -d ${PB_CACHE_DIR} ] && mkdir ${PB_CACHE_DIR}    # Create BSU cache directory if it does not exist
+      unzip -oq ${PB_DIR}/p*-bsu.zip -d ${PB_CACHE_DIR}
       msg patch_wls INFO "Updating WLS Smart Update to v3.3.0"
-      ${JAVA_HOME}/bin/java -jar ${PB_DIR}/cache_dir/patch-client-installer330_generic32.jar -mode=silent -silent_xml=${BSU_RSP_FILE}
-      rm -rf ${PB_DIR}/cache_dir    # Clean up BSU cache directory 
+      ${JAVA_HOME}/bin/java -jar ${PB_CACHE_DIR}/patch-client-installer330_generic32.jar -mode=silent -silent_xml=${BSU_RSP_FILE}
+      rm -rf ${PB_CACHE_DIR}    # Clean up BSU cache directory 
     fi
     
     # Apply PSU first. The file MUST be manually renamed correctly
     # as we are expecting it to match a certain format such that the filtering works
-    [ ! -d ${PB_CACHE_DIR} ] && mkdir ${PB_CACHE_DIR}    # Create BSU cache directory if it does not exist
-    unzip -oq ${PB_DIR}/p*Generic-psu*.zip -d ${PB_CACHE_DIR}
-    psupatch=`basename $(ls -1 ${PB_CACHE_DIR}/*.jar | cut -d '.' -f1)`        # Get just the patch ID name
+    [ ! -d ${BSU_CACHE_DIR} ] && mkdir ${BSU_CACHE_DIR}    # Create BSU cache directory if it does not exist
+    unzip -oq ${PB_DIR}/p*Generic-psu*.zip -d ${BSU_CACHE_DIR}
+    psupatch=`basename $(ls -1 ${BSU_CACHE_DIR}/*.jar | cut -d '.' -f1)`        # Get just the patch ID name
     
     # Save current directory and switch to the location of bsu script as it cannot be called outside it's home (MOS 1326309.1; bug# 8478260)
     CURR_DIR=${PWD}
     cd ${BSU_DIR}
     msg patch_wls INFO "Applying PSU to WLS."
-    ${BSU_DIR}/bsu.sh -install -patchlist=${psupatch} -patch_download_dir=${PB_CACHE_DIR} -prod_dir=${WL_HOME} -log=${PB_LOG}  
+    ${BSU_DIR}/bsu.sh -install -patchlist=${psupatch} -patch_download_dir=${BSU_CACHE_DIR} -prod_dir=${WL_HOME} -log=${BSU_LOG}  
 
     # Check if other patches are available
     if [ `ls -l ${PB_DIR}/p*.zip 2>/dev/null | grep -v psu | grep -v bsu | wc -l` -gt 0 ]; then   # Not empty directory
       # Uncompress other patches in directory (in zip format) to cache dir and apply
       for fname in `ls -l ${PB_DIR}/p*.zip | grep -v psu | grep -v bsu`; do
-        unzip -oq ${fname} -d ${PB_CACHE_DIR}
+        unzip -oq ${fname} -d ${BSU_CACHE_DIR}
       done
 
       # Apply other patches
-      for patchname in `basename $(ls -1 ${PB_CACHE_DIR}/*.jar | grep -v ${psupatch} | cut -d '.' -f1)`; do
+      for patchname in `basename $(ls -1 ${BSU_CACHE_DIR}/*.jar | grep -v ${psupatch} | cut -d '.' -f1)`; do
         msg patch_wls INFO "Applying WLS patch ${patchname}."
-        ${BSU_DIR}/bsu.sh -install -patchlist=${patchname} -patch_download_dir=${PB_CACHE_DIR} -prod_dir=${WL_HOME} -log=${PB_LOG}
+        ${BSU_DIR}/bsu.sh -install -patchlist=${patchname} -patch_download_dir=${BSU_CACHE_DIR} -prod_dir=${WL_HOME} -log=${BSU_LOG}
       done
     fi
     cd ${CURR_DIR}
@@ -269,7 +273,7 @@ done
 . ${SETUP_FILE}
 
 LOGFILE=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`.log
-PB_LOG=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`-bsu.log
+BSU_LOG=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`-bsu.log
 
 # Setup staging
 RUN_DT=`date "+%Y%m%d-%H%M%S"`

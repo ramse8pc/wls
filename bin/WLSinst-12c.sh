@@ -32,6 +32,7 @@
 # 2014/03/25 cgwong - [v2.3.1] Removed inventory update (process does not exist).
 #                     Updated directory empty checks.
 # 2014/04/17 cgwong: [v2.3.2] Various minor code improvements.
+# 2014/05/07 cgwong: [v2.3.3] Updated patching variables. 
 ######################################################
 
 SCRIPT=`basename $0`
@@ -191,6 +192,9 @@ install_wls()
 
 patch_wls ()
 { # Apply patches to WLS
+  # Patch bundle cache directory
+  PB_CACHE_DIR=${STG_DIR}/cache_dir
+  
   if [ `ls ${PB_DIR}/*.zip 2>/dev/null | wc -l` -gt 0 ]; then   # Not empty directory
     msg patch_wls INFO "Applying patch bundle ${PB} to WLS..."
     # Apply latest OPatch first
@@ -259,7 +263,6 @@ done
 . ${SETUP_FILE}
 
 LOGFILE=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`.log
-BSU_LOG=${LOG_DIR}/`echo ${SCRIPT} | awk -F"." '{print $1}'`-bsu.log
 
 # Setup staging
 RUN_DT=`date "+%Y%m%d-%H%M%S"`
