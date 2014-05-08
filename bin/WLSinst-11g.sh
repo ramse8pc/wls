@@ -205,7 +205,7 @@ patch_wls ()
     # This is ONLY required for WLS 10.3.5 so it can apply latest patches. The file MUST be manually renamed correctly
     # as we are expecting it to match a certain format such that the filtering works
     if [ `ls ${PB_DIR}/p*Generic-bsu.zip 2>/dev/null | wc -l` -gt 0 ]; then
-      [ ! -d ${PB_CACHE_DIR} ] && mkdir ${PB_CACHE_DIR}    # Create BSU cache directory if it does not exist
+      [ ! -d ${PB_CACHE_DIR} ] && mkdir -p ${PB_CACHE_DIR}    # Create BSU cache directory if it does not exist
       unzip -oq ${PB_DIR}/p*-bsu.zip -d ${PB_CACHE_DIR}
       msg patch_wls INFO "Updating WLS Smart Update to v3.3.0"
       ${JAVA_HOME}/bin/java -jar ${PB_CACHE_DIR}/patch-client-installer330_generic32.jar -mode=silent -silent_xml=${BSU_RSP_FILE}
@@ -214,7 +214,7 @@ patch_wls ()
     
     # Apply PSU first. The file MUST be manually renamed correctly
     # as we are expecting it to match a certain format such that the filtering works
-    [ ! -d ${BSU_CACHE_DIR} ] && mkdir ${BSU_CACHE_DIR}    # Create BSU cache directory if it does not exist
+    [ ! -d ${BSU_CACHE_DIR} ] && mkdir -p ${BSU_CACHE_DIR}    # Create BSU cache directory if it does not exist
     unzip -oq ${PB_DIR}/p*Generic-psu*.zip -d ${BSU_CACHE_DIR}
     psupatch=`basename $(ls -1 ${BSU_CACHE_DIR}/*.jar | cut -d '.' -f1)`        # Get just the patch ID name
     

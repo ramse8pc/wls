@@ -147,7 +147,7 @@ install_jdk()
   
   msg install_jdk INFO "Installing Oracle JDK..."
   tar xzf ${JVM_FILE} -C ${STG_DIR}
-  mkdir ${JVM_HOME}
+  mkdir -p ${JVM_HOME}
   mv ${STG_DIR}/${JDK_DEFAULT_NAME}/* ${JVM_HOME}/
   rmdir ${STG_DIR}/${JDK_DEFAULT_NAME}
   
